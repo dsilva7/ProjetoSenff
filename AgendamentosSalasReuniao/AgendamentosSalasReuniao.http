@@ -1,0 +1,6 @@
+@AgendamentosSalasReuniao_HostAddress = http://localhost:5273
+
+GET {{AgendamentosSalasReuniao_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
