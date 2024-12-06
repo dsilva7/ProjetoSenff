@@ -16,16 +16,23 @@ namespace Infraestrutura.Data
             // Configurações do modelo
 
             modelBuilder.Entity<Sala>()
-                .HasKey(p => p.Id);
+                .HasKey(p => p.SalaId);
 
             modelBuilder.Entity<Reserva>(x =>
             {
-                x.HasKey(p => p.Id);
+                x.HasKey(p => p.ReservaId);
 
-                x.HasOne(y => y.Sala)
+                x.HasOne(p => p.Sala)
                 .WithMany()
-                .HasForeignKey(l => l.SalaId);
+                .HasForeignKey(y => y.SalaId);
+
+                x.HasOne(p => p.Usuario)
+                .WithMany()
+                .HasForeignKey(y => y.UsuarioId);
             });
+
+            modelBuilder.Entity<Usuario>()
+                .HasKey(p => p.UsuarioId);
         }
     }
 }

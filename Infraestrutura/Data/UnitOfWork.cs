@@ -29,6 +29,16 @@ namespace Infraestrutura.Data
             {
                 return this.reservaRepository = this.reservaRepository ?? new GenericRepository<SenffContext, Reserva>(this.context);
             }
+
+        }
+
+        private GenericRepository<SenffContext, Usuario> usuarioRepository;
+        public GenericRepository<SenffContext, Usuario> UsuarioRepository
+        {
+            get
+            {
+                return this.usuarioRepository = this.usuarioRepository ?? new GenericRepository<SenffContext, Usuario>(this.context);
+            }
         }
     }
 }
