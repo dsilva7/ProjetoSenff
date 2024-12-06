@@ -12,5 +12,6 @@ namespace Aplicacao.Models
         public DateTime DataHoraReserva { get; set; }
         public int UsuarioId { get; set; }
         public int QtdePessoas { get; set; }
+        public int QtdeHorasUtilizacao { get; set; }
     }
 }

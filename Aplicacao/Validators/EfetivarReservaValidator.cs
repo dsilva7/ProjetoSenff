@@ -16,8 +16,12 @@ namespace Aplicacao.Validators
             RuleFor(x => x.QtdePessoas)
                 .GreaterThan(0).WithMessage("É necessário informar a quantidade de pessoas.");
 
+            RuleFor(x => x.QtdeHorasUtilizacao)
+                .GreaterThan(0).WithMessage("É necessário informar as horas de utilização.");
+
             RuleFor(x => x.DataHoraReserva)
                 .NotEmpty().WithMessage("É necessário informar a data para reserva.");
+
         }
     }
 }

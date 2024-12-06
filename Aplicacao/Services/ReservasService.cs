@@ -3,6 +3,8 @@ using Common;
 using Dominios.Entities;
 using FluentValidation;
 using Infraestrutura.Data;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Aplicacao.Services
 {
@@ -36,16 +38,17 @@ namespace Aplicacao.Services
                 SalaId = solicitacaoReserva.SalaId,
                 DataHora = solicitacaoReserva.DataHoraReserva,
                 QtdePessoas = solicitacaoReserva.QtdePessoas,
-                UsuarioId = solicitacaoReserva.UsuarioId
+                UsuarioId = solicitacaoReserva.UsuarioId,
+                DataHoraFinal = solicitacaoReserva.DataHoraReserva.AddHours(solicitacaoReserva.QtdeHorasUtilizacao)
             };
 
             try
             {
                 var usuario = this.unitOfWork.UsuarioRepository
                     .Where(s => s.UsuarioId == solicitacaoReserva.UsuarioId)
-                    .FirstOrDefault();
+                    .FirstOrDefault();                
 
-                if (reservas.Any(s => s.SalaId == solicitacaoReserva.SalaId && s.DataHora == solicitacaoReserva.DataHoraReserva))
+                if (reservas.Any(s => s.SalaId == solicitacaoReserva.SalaId && solicitacaoReserva.DataHoraReserva >= s.DataHora && solicitacaoReserva.DataHoraReserva <= s.DataHoraFinal))
                 {
                     var email = await emailService.EnviarEmailAsync(usuario.Email, "Reserva", $"A reserva na data {solicitacaoReserva.DataHoraReserva} foi recusada, pois, já existe uma reserva nesse horário.");
 
@@ -58,17 +61,17 @@ namespace Aplicacao.Services
                 }
                 else
                 {
-                    var email = await emailService.EnviarEmailAsync(usuario.Email, "Confirmação da Reserva", $"A reserva na data {solicitacaoReserva.DataHoraReserva} foi efetivada.");
+                    this.unitOfWork.ReservaRepository.Add(reserva);
+
+                    await this.unitOfWork.SaveAsync();
+
+                    var email = await emailService.EnviarEmailAsync(usuario.Email, "Confirmação da Reserva", $"A reserva na data {solicitacaoReserva.DataHoraReserva} foi efetivada. Para {solicitacaoReserva.QtdeHorasUtilizacao} horas");
 
                     if (!email)
                     {
                         return $"Não foi possível solicitar a reserva, verifique o e-mail informado e tente novamente.";
                     }
                 }
-
-                this.unitOfWork.ReservaRepository.Add(reserva);
-
-                await this.unitOfWork.SaveAsync();
 
                 return "Solicitação de Reserva confirmada, em breve receberá um retorno no e-mail cadastrado";
             }

@@ -50,5 +50,23 @@ namespace Aplicacao.Services
                 return $"O cadastro da {cadastro.NomeSala} foi recusado: {ex.Message}!";
             }
         }
+
+        public async Task<List<ListarSalasRetornoModel>> ListarSalasDisponiveis(FiltrosSalaDisponivelModel filtros)
+        {
+            var salasId = this.unitOfWork.SalaRepository
+                .Where(s => filtros.Recursos.Contains(s.Recursos))
+                .Select(x => x.SalaId)
+                .ToList();
+
+            return this.unitOfWork.ReservaRepository
+                .Where(s => salasId.Contains(s.SalaId) && filtros.DataHoraDesejada != s.DataHora && filtros.DataHoraDesejada > s.DataHoraFinal)
+                .Select(x => new ListarSalasRetornoModel
+                {
+                    NomeSala = x.Sala.Nome,
+                    CapacidadeMaxima = x.Sala.Capacidade,
+                    Recursos = x.Sala.Recursos
+                })
+                .ToList();
+        }
     }
 }

@@ -21,6 +21,13 @@ namespace AgendamentosSalasReuniao.Controllers
         {
             return await this.salasService.CadastrarSala(cadastroSala);
         }
+
+        [HttpGet("salas/disponiveis")]
+        public async Task<IActionResult> ListarSalasDisponiveis(FiltrosSalaDisponivelModel filtros)
+        {
+            var salas = await this.salasService.ListarSalasDisponiveis(filtros);
+            return Ok(salas);
+        }
     }
 }
 
