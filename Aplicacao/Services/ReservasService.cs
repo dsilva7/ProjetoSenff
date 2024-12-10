@@ -33,6 +33,9 @@ namespace Aplicacao.Services
                 throw new Exception(erros);
             }
 
+            if (this.unitOfWork.SalaRepository.Any(s => s.Capacidade < solicitacaoReserva.QtdePessoas))
+                return "A sala escolhida não acolhe a quantidade de pessoas informada.";
+
             var reserva = new Reserva
             {
                 SalaId = solicitacaoReserva.SalaId,
@@ -65,7 +68,7 @@ namespace Aplicacao.Services
 
                     await this.unitOfWork.SaveAsync();
 
-                    var email = await emailService.EnviarEmailAsync(usuario.Email, "Confirmação da Reserva", $"A reserva na data {solicitacaoReserva.DataHoraReserva} foi efetivada. Para {solicitacaoReserva.QtdeHorasUtilizacao} horas");
+                    var email = await emailService.EnviarEmailAsync(usuario.Email, "Confirmação da Reserva", $"A reserva na data {solicitacaoReserva.DataHoraReserva.ToString("dd/MM/yyyy HH:mm")} foi efetivada para {solicitacaoReserva.QtdeHorasUtilizacao} horas.");
 
                     if (!email)
                     {
@@ -79,6 +82,20 @@ namespace Aplicacao.Services
             {
                 return $"Não foi possível reservar a sala: {ex.Message}";
             }
+        }
+
+        public async Task<List<ListarReservaRetornoModel>> ListarReservas(int usuarioId)
+        {
+            return await this.unitOfWork.ReservaRepository
+            .Where(s => s.UsuarioId == usuarioId)
+            .Select(x => new ListarReservaRetornoModel
+            {
+                NomeSala = x.Sala.Nome,
+                QtdePessoas = x.QtdePessoas,
+                DataHoraReserva = x.DataHora.ToString("dd/MM/yyyy HH:mm"),
+                NomeUsuario = x.Usuario.Nome
+            })
+            .ToListAsync();
         }
     }
 }

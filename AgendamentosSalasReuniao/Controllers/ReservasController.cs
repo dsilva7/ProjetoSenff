@@ -26,16 +26,7 @@ namespace AgendamentosSalasReuniao.Controllers
         [HttpGet("historico")]
         public async Task<IActionResult> ListarReservas(int usuarioId)
         {
-            var lista = await this.unitOfWork.ReservaRepository
-            .Where(s => s.UsuarioId == usuarioId)
-            .Select(x => new ListarReservaRetornoModel
-            {
-                NomeSala = x.Sala.Nome,
-                QtdePessoas = x.QtdePessoas,
-                DataHoraReserva = x.DataHora.ToString("dd/MM/yyyy HH:mm"),
-                NomeUsuario = x.Usuario.Nome
-            })
-            .ToListAsync();
+            var lista = await this.reservasService.ListarReservas(usuarioId);
 
             if (!lista.Any())
                 return NotFound(new { Message = "Sem histórico de reservas para esse usuário." });
