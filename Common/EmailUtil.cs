@@ -1,23 +1,23 @@
-﻿using SendGrid;
+﻿using Microsoft.Extensions.Configuration;
+using SendGrid;
 using SendGrid.Helpers.Mail;
 
 namespace Common
 {
     public class EmailService
     {
-        // readonly ISendGridClient _sendGridClient;
+        private readonly string _apiKey;
         private const string EMAIL = "dwsilva1996@gmail.com";
         private const string EMPRESA = "Senff";
 
-        //public EmailService(ISendGridClient sendGridClient)
-        //{
-        //    _sendGridClient = sendGridClient;
-        //}
+        public EmailService(IConfiguration configuration)
+        {
+            _apiKey = configuration["SendGrid:ApiKey"];
+        }
 
         public async Task<bool> EnviarEmailAsync(string destinatario, string assunto, string corpo)
-        {
-            var apiKey = Environment.GetEnvironmentVariable("ApiKey");
-            var client = new SendGridClient(apiKey);
+        {            
+            var client = new SendGridClient(_apiKey);
             var emailDeRemetente = new EmailAddress(EMAIL, EMPRESA);
             var emailDestinatario = new EmailAddress(destinatario);
             var mensagem = MailHelper.CreateSingleEmail(emailDeRemetente, emailDestinatario, assunto, corpo, null);

@@ -33,7 +33,7 @@ namespace Aplicacao.Services
                 throw new Exception(erros);
             }
 
-            if (this.unitOfWork.SalaRepository.Any(s => s.Capacidade < solicitacaoReserva.QtdePessoas))
+            if (this.unitOfWork.SalaRepository.Any(s => s.SalaId == solicitacaoReserva.SalaId && s.Capacidade < solicitacaoReserva.QtdePessoas))
                 return "A sala escolhida não acolhe a quantidade de pessoas informada.";
 
             var reserva = new Reserva
